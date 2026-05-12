@@ -74,27 +74,52 @@
            1. Top of page (transparent over dark hero): cream text
            2. Scrolled over LIGHT section: cream-blur bg + espresso text
            3. Scrolled over DARK section (.dark-section): espresso-blur bg + cream text
+
+           Note: we set color explicitly on #navbar AND its descendant anchors/spans
+           because the body sets `color: espresso` and some descendants (anchors via
+           browser defaults) won't inherit reliably across all UAs. The `<i class="text-tomato">`
+           inside the wordmark stays tomato because Tailwind's utility wins on the
+           specific child element.
         */
-        #navbar {
+        #navbar,
+        #navbar a,
+        #navbar span,
+        #navbar button {
             color: theme('colors.cream');
+        }
+        #navbar {
             transition: color 0.3s ease, background-color 0.5s ease, padding 0.5s ease;
         }
 
         #navbar.nav-scrolled {
             background-color: rgba(250, 246, 238, 0.85);
-            color: theme('colors.espresso');
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(27, 20, 16, 0.05);
             box-shadow: inset 0 -1px 0 0 rgba(255,255,255,0.2);
         }
+        #navbar.nav-scrolled,
+        #navbar.nav-scrolled a,
+        #navbar.nav-scrolled span,
+        #navbar.nav-scrolled button {
+            color: theme('colors.espresso');
+        }
 
         body.dark-section-active #navbar.nav-scrolled {
             background-color: rgba(27, 20, 16, 0.85);
-            color: theme('colors.cream');
             border-bottom: 1px solid rgba(250, 246, 238, 0.05);
             box-shadow: inset 0 -1px 0 0 rgba(0,0,0,0.2);
         }
+        body.dark-section-active #navbar.nav-scrolled,
+        body.dark-section-active #navbar.nav-scrolled a,
+        body.dark-section-active #navbar.nav-scrolled span,
+        body.dark-section-active #navbar.nav-scrolled button {
+            color: theme('colors.cream');
+        }
+
+        /* Keep brand accents fixed across all nav states */
+        #navbar .text-tomato { color: theme('colors.tomato'); }
+        #navbar a[href="#notify"] { color: theme('colors.cream'); }
 
         /* Link Underline Animation */
         .hover-underline {
