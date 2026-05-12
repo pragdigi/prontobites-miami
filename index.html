@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProntoBites Miami | Italian, Pronto.</title>
+    <meta name="description" content="Takeout, delivery, and quick-bite Italian — coming back to Miami. The evolution of CRUST Miami.">
+    
+    <!-- Fonts: Fraunces (Editorial Serif) & Outfit (Clean UI Grotesk) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuration & Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#FAF6EE',
+                        espresso: '#1B1410',
+                        tomato: '#D8412C',
+                        sage: '#7A8A5A',
+                        'espresso-light': '#2A211B',
+                    },
+                    fontFamily: {
+                        serif: ['Fraunces', 'serif'],
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    transitionTimingFunction: {
+                        'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'ease-out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    },
+                    animation: {
+                        'marquee': 'marquee 30s linear infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* High-End Architectural CSS & Micro-Interactions */
+        :root {
+            --nav-height: 80px;
+        }
+
+        body {
+            background-color: theme('colors.cream');
+            color: theme('colors.espresso');
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Fluid Typography Override for Extreme Sizes */
+        .text-hero {
+            font-size: clamp(3.5rem, 10vw, 11rem);
+            line-height: 0.85;
+            letter-spacing: -0.04em;
+        }
+
+        /* Adaptive Navbar Color Architecture
+           Three states:
+           1. Top of page (transparent over dark hero): cream text
+           2. Scrolled over LIGHT section: cream-blur bg + espresso text
+           3. Scrolled over DARK section (.dark-section): espresso-blur bg + cream text
+        */
+        #navbar {
+            color: theme('colors.cream');
+            transition: color 0.3s ease, background-color 0.5s ease, padding 0.5s ease;
+        }
+
+        #navbar.nav-scrolled {
+            background-color: rgba(250, 246, 238, 0.85);
+            color: theme('colors.espresso');
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(27, 20, 16, 0.05);
+            box-shadow: inset 0 -1px 0 0 rgba(255,255,255,0.2);
+        }
+
+        body.dark-section-active #navbar.nav-scrolled {
+            background-color: rgba(27, 20, 16, 0.85);
+            color: theme('colors.cream');
+            border-bottom: 1px solid rgba(250, 246, 238, 0.05);
+            box-shadow: inset 0 -1px 0 0 rgba(0,0,0,0.2);
+        }
+
+        /* Link Underline Animation */
+        .hover-underline {
+            position: relative;
+        }
+        .hover-underline::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        .hover-underline:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Image Masking & Spring Hover */
+        .image-mask {
+            clip-path: inset(0 0 0 0 round 1.5rem);
+            transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .group:hover .image-mask {
+            clip-path: inset(0.5rem 0.5rem 0.5rem 0.5rem round 1rem);
+        }
+
+        /* Staggered Orchestration Reveal Elements */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Delays using local var injected by JS or hardcoded for specific layouts */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Custom Selection */
+        ::selection {
+            background-color: theme('colors.tomato');
+            color: theme('colors.cream');
+        }
+
+        /* Subtle Grain - Fixed */
+        .bg-grain {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0.15;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            mix-blend-mode: multiply;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal-up { transition: none; opacity: 1; transform: none; }
+            .animate-marquee { animation-play-state: paused; }
+            .group:hover .image-mask { clip-path: inset(0 0 0 0 round 1.5rem); }
+        }
+    </style>
+</head>
+<body class="relative overflow-x-hidden">
+
+    <!-- Pointer-events-none Architectural Grain -->
+    <div class="bg-grain"></div>
+
+    <!-- Navigation Architecture -->
+    <header id="navbar" class="fixed top-0 w-full z-40 transition-all duration-500 bg-transparent py-4">
+        <div class="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-[var(--nav-height)]">
+            
+            <!-- Wordmark -->
+            <a href="#" class="z-50 relative group flex items-center gap-2" aria-label="ProntoBites Home">
+                <span class="font-serif text-3xl font-medium tracking-tight">Pronto<i class="text-tomato italic group-hover:text-amber-500 transition-colors duration-300">Bites</i></span>
+            </a>
+
+            <!-- Desktop Meso-Architecture -->
+            <nav class="hidden lg:flex items-center gap-8 font-sans text-sm font-medium tracking-wide uppercase mt-1">
+                <a href="#concept" class="hover-underline">Concept</a>
+                <a href="#menu" class="hover-underline">Menu</a>
+                <a href="#story" class="hover-underline">Story</a>
+                <a href="#scout" class="hover-underline">Locations</a>
+            </nav>
+
+            <!-- CTA & Mobile Toggle -->
+            <div class="flex items-center gap-4 z-50">
+                <a href="#notify" class="hidden md:inline-flex items-center justify-center bg-tomato text-cream px-6 py-2.5 rounded-full font-sans text-sm font-semibold tracking-wide uppercase shadow-[0_4px_14px_0_rgba(216,65,44,0.39)] hover:-translate-y-[2px] hover:shadow-[0_6px_20px_rgba(216,65,44,0.4)] active:scale-[0.98] transition-all duration-300">
+                    Notify Me
+                </a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 -mr-2 text-current outline-none focus-visible:ring-2 focus-visible:ring-tomato rounded-md" aria-label="Toggle Menu">
+                    <svg class="w-7 h-7 stroke-[1.5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-espresso/95 backdrop-blur-xl z-30 flex justify-center items-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <nav class="flex flex-col items-center gap-8 text-cream text-4xl font-serif text-center">
+            <a href="#concept" class="mobile-link hover:text-tomato transition-colors">Concept</a>
+            <a href="#menu" class="mobile-link hover:text-tomato transition-colors">Menu</a>
+            <a href="#story" class="mobile-link hover:text-tomato transition-colors">Story</a>
+            <a href="#scout" class="mobile-link hover:text-tomato transition-colors">Locations</a>
+            <a href="#notify" class="mobile-link hover:text-tomato transition-colors">Contact</a>
+        </nav>
+    </div>
+
+    <!-- MAIN SHELL -->
+    <main>
+        
+        <!-- ==============================================
+             SECTION 1: HERO (Immersive Macro-Architecture)
+             ============================================== -->
+        <section class="relative min-h-[100dvh] w-full flex flex-col justify-end pb-32 overflow-hidden bg-espresso">
+            <!-- Background Image -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=2800&q=80" alt="Close up of a hot, freshly baked Neapolitan margherita pizza slice being lifted" class="w-full h-full object-cover object-center scale-105 animate-[pulse_20s_ease-in-out_infinite_alternate]" />
+                <div class="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/60 to-black/20 mix-blend-multiply"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-espresso/80 via-transparent to-transparent"></div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="relative z-10 max-w-[1400px] w-full mx-auto px-6 md:px-12 text-cream pt-32">
+                
+                <div class="inline-flex items-center gap-2 bg-cream/10 backdrop-blur-md border border-cream/20 rounded-full px-4 py-1.5 mb-8 reveal-up">
+                    <span class="w-2 h-2 rounded-full bg-tomato animate-pulse"></span>
+                    <span class="font-sans text-xs uppercase tracking-widest font-medium">From the team behind CRUST Miami</span>
+                </div>
+
+                <div class="max-w-5xl">
+                    <h1 class="font-serif text-hero mb-6 text-cream reveal-up delay-100">
+                        Italian,<br/><i class="text-tomato font-light pr-4">Pronto.</i>
+                    </h1>
+                    <p class="font-sans text-xl md:text-2xl text-cream/80 max-w-2xl leading-relaxed mb-10 reveal-up delay-200">
+                        Takeout, delivery, and quick-bite Italian — coming back to Miami. The unmistakable quality, reimagined for right now.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 reveal-up delay-300">
+                        <a href="#notify" class="inline-flex justify-center items-center bg-tomato text-cream px-8 py-4 rounded-full font-sans text-sm font-bold tracking-wide uppercase hover:-translate-y-1 hover:shadow-xl hover:shadow-tomato/30 transition-all duration-spring">
+                            Get Notified
+                        </a>
+                        <a href="#story" class="inline-flex justify-center items-center px-8 py-4 rounded-full font-sans text-sm font-bold tracking-wide uppercase border border-cream/30 text-cream hover:bg-cream hover:text-espresso transition-all duration-300">
+                            Our Story
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Absolute Bottom Marquee & Scroll Indicator -->
+            <div class="absolute bottom-0 left-0 w-full z-20 flex flex-col justify-end">
+                <!-- Data Density: Perpetual Motion -->
+                <div class="w-full bg-tomato text-cream py-3 overflow-hidden border-y border-espresso/20 flex items-center">
+                    <div class="flex gap-8 whitespace-nowrap animate-marquee font-sans uppercase font-bold tracking-widest text-sm">
+                        <span>PIZZA</span><span class="opacity-50">·</span>
+                        <span>PASTA</span><span class="opacity-50">·</span>
+                        <span>PANINI</span><span class="opacity-50">·</span>
+                        <span>ARANCINI</span><span class="opacity-50">·</span>
+                        <span>ESPRESSO</span><span class="opacity-50">·</span>
+                        <span>DOLCI</span><span class="opacity-50">·</span>
+                        <!-- Repeat for infinite illusion -->
+                        <span>PIZZA</span><span class="opacity-50">·</span>
+                        <span>PASTA</span><span class="opacity-50">·</span>
+                        <span>PANINI</span><span class="opacity-50">·</span>
+                        <span>ARANCINI</span><span class="opacity-50">·</span>
+                        <span>ESPRESSO</span><span class="opacity-50">·</span>
+                        <span>DOLCI</span><span class="opacity-50">·</span>
+                        <span>PIZZA</span><span class="opacity-50">·</span>
+                        <span>PASTA</span><span class="opacity-50">·</span>
+                        <span>PANINI</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==============================================
+             SECTION 2: CONCEPT STRIP (Structural Logic)
+             ============================================== -->
+        <section id="concept" class="py-24 md:py-32 max-w-[1400px] mx-auto px-6 md:px-12 bg-cream">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                
+                <!-- Concept 1 -->
+                <div class="group border-t border-espresso/20 pt-8 reveal-up">
+                    <svg class="w-8 h-8 mb-6 text-espresso group-hover:text-tomato transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <h3 class="font-serif text-2xl font-semibold mb-3 tracking-tight">Takeout</h3>
+                    <p class="font-sans text-espresso/70 leading-relaxed text-sm">Hot, fresh, and packaged to travel perfectly. Skip the wait, grab the goods.</p>
+                </div>
+
+                <!-- Concept 2 -->
+                <div class="group border-t border-espresso/20 pt-8 reveal-up delay-100">
+                    <svg class="w-8 h-8 mb-6 text-espresso group-hover:text-tomato transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <h3 class="font-serif text-2xl font-semibold mb-3 tracking-tight">Delivery</h3>
+                    <p class="font-sans text-espresso/70 leading-relaxed text-sm">Miami traffic shouldn't keep you from great Italian. From our oven to your door.</p>
+                </div>
+
+                <!-- Concept 3 -->
+                <div class="group border-t border-espresso/20 pt-8 reveal-up delay-200">
+                    <svg class="w-8 h-8 mb-6 text-espresso group-hover:text-tomato transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="font-serif text-2xl font-semibold mb-3 tracking-tight">Quick-Bite</h3>
+                    <p class="font-sans text-espresso/70 leading-relaxed text-sm">Stand up, eat an arancini, drink an espresso, and get back to your day.</p>
+                </div>
+
+                <!-- Concept 4 -->
+                <div class="group border-t border-espresso/20 pt-8 reveal-up delay-300">
+                    <svg class="w-8 h-8 mb-6 text-espresso group-hover:text-tomato transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <h3 class="font-serif text-2xl font-semibold mb-3 tracking-tight">Catering</h3>
+                    <p class="font-sans text-espresso/70 leading-relaxed text-sm">Feeding the whole office or family? Trays of pasta and large formats available.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================================
+             SECTION 3: STORY (Asymmetric Editorial Grid)
+             ============================================== -->
+        <section id="story" class="py-24 md:py-32 bg-cream border-t border-espresso/5 overflow-hidden">
+            <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
+                
+                <!-- Left Column: Portrait Image (40% split conceptually) -->
+                <div class="lg:col-span-5 relative group reveal-up">
+                    <div class="relative w-full aspect-[4/5] object-cover rounded-3xl overflow-hidden image-mask bg-espresso-light">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80" alt="Chefs tossing flour and making fresh pasta dough in a bustling kitchen" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-105" loading="lazy" />
+                        <!-- Subtle Inner Shadow for materiality -->
+                        <div class="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(27,20,16,0.1)] rounded-3xl z-10 pointer-events-none"></div>
+                    </div>
+                    
+                    <!-- Decorative Floating Element -->
+                    <div class="absolute -bottom-6 -right-6 lg:-right-12 bg-white p-6 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] max-w-[200px] rotate-[-2deg] transition-transform duration-500 group-hover:rotate-0">
+                        <span class="font-sans text-xs uppercase tracking-widest text-espresso/50 block mb-1">Legacy</span>
+                        <span class="font-serif italic text-xl text-espresso">Est. (again) 2026.</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Text Content (60% split) -->
+                <div class="lg:col-span-6 lg:col-start-7 flex flex-col justify-center text-espresso reveal-up delay-200">
+                    <span class="font-sans text-sm uppercase tracking-widest text-tomato font-bold mb-6 flex items-center gap-4">
+                        Our Story <span class="h-[1px] w-12 bg-tomato block"></span>
+                    </span>
+                    <h2 class="font-serif text-4xl md:text-6xl tracking-tight leading-[1.05] mb-8">
+                        After a hiatus, we're back — <i class="text-sage italic">pronto.</i>
+                    </h2>
+                    
+                    <div class="space-y-6 font-sans text-lg text-espresso/80 leading-relaxed max-w-xl">
+                        <p>
+                            The team behind CRUST Miami is returning to serve the community again. 
+                        </p>
+                        <p>
+                            ProntoBites is the evolution of the original concept — carrying forward the exact same obsession with quality ingredients and warm hospitality, fundamentally reimagined for how Miami eats today. 
+                        </p>
+                        <p>
+                            We recognized the need for something that bridges the gap. It's fast, it's fresh, and it's unmistakably Italian. No compromises, just incredible food built for the rhythm of the city.
+                        </p>
+                    </div>
+
+                    <!-- Callout Quote -->
+                    <blockquote class="mt-12 pl-6 border-l-2 border-espresso/20 italic font-serif text-2xl text-espresso max-w-lg">
+                        "The exact same obsession with quality, built for the modern pace."
+                    </blockquote>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================================
+             SECTION 4: MENU PREVIEW (Bento-ish Grid Dynamics)
+             ============================================== -->
+        <section id="menu" class="py-32 bg-cream relative">
+            <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+                
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 reveal-up">
+                    <div class="max-w-2xl">
+                        <span class="font-sans text-sm uppercase tracking-widest text-espresso/50 block mb-4">A Taste of What's Coming</span>
+                        <h2 class="font-serif text-5xl md:text-7xl tracking-tighter text-espresso">The Pronto Menu.</h2>
+                    </div>
+                    <p class="font-sans text-espresso/60 md:text-right text-sm uppercase tracking-widest">
+                        Full menu drops at launch.
+                    </p>
+                </div>
+
+                <!-- Meso-Architecture: Advanced Grid System -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-16">
+                    
+                    <!-- Item 1 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80" alt="New York style Margherita pizza slice" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <!-- Floating Chip -->
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $4
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Margherita Slice</h3>
+                            <p class="font-sans text-espresso/70 text-sm">San Marzano DOP, fresh mozzarella, torn basil. The baseline of greatness.</p>
+                        </div>
+                    </article>
+
+                    <!-- Item 2 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up delay-100">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Freshly pressed panini with prosciutto and arugula" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $14
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Prosciutto Panino</h3>
+                            </div>
+                            <p class="font-sans text-espresso/70 text-sm">Prosciutto di Parma, stracciatella, hot honey, arugula on fresh schiacciata.</p>
+                        </div>
+                    </article>
+
+                    <!-- Item 3 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up delay-200">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1624371414325-e208cae18efc?auto=format&fit=crop&w=800&q=80" alt="Three golden fried arancini balls" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $9
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Arancini (3pc)</h3>
+                            <p class="font-sans text-espresso/70 text-sm">Crispy risotto balls stuffed with beef ragù and sweet peas. Served with marinara.</p>
+                        </div>
+                    </article>
+
+                    <!-- Item 4 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800&q=80" alt="Rigatoni pasta covered in creamy vodka sauce" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $16
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Rigatoni alla Vodka</h3>
+                            <p class="font-sans text-espresso/70 text-sm">Al dente rigatoni, spicy Calabrian chili vodka sauce, heavy Parmigiano.</p>
+                        </div>
+                    </article>
+
+                    <!-- Item 5 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up delay-100">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&w=800&q=80" alt="Tiramisu served in a modern clear cup" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $8
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Tiramisu Cup</h3>
+                            <p class="font-sans text-espresso/70 text-sm">Espresso-soaked ladyfingers, mascarpone cream, dusted in dark cocoa. To-go ready.</p>
+                        </div>
+                    </article>
+
+                    <!-- Item 6 -->
+                    <article class="group relative flex flex-col gap-4 reveal-up delay-200">
+                        <div class="relative w-full aspect-square overflow-hidden rounded-[2rem] bg-black/5 image-mask">
+                            <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" alt="Double espresso shot with beautiful crema" class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out-expo group-hover:scale-110" loading="lazy">
+                            <div class="absolute top-4 left-4 bg-espresso text-cream px-3 py-1 rounded-full font-sans text-xs font-bold uppercase tracking-wide">
+                                Coming Soon
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full font-sans font-bold text-espresso shadow-sm">
+                                $3
+                            </div>
+                        </div>
+                        <div class="px-2">
+                            <h3 class="font-serif text-2xl mb-1 text-espresso group-hover:text-tomato transition-colors">Doppio Espresso</h3>
+                            <p class="font-sans text-espresso/70 text-sm">A dark, rich double shot pulling strong Neapolitan tradition. Fast and bold.</p>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             SECTION 5: SCOUTING (Dark Paradigm Shift)
+             ============================================== -->
+        <section id="scout" class="py-32 bg-espresso text-cream relative dark-section">
+            <div class="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                
+                <!-- Left: Form Action -->
+                <div class="reveal-up">
+                    <span class="font-sans text-sm uppercase tracking-widest text-tomato font-bold mb-6 flex items-center gap-4">
+                        Now Scouting <span class="h-[1px] w-12 bg-tomato block"></span>
+                    </span>
+                    <h2 class="font-serif text-5xl md:text-6xl tracking-tight leading-[1.05] mb-6">
+                        The search for our new home has officially begun.
+                    </h2>
+                    <p class="font-sans text-lg text-cream/70 leading-relaxed mb-12 max-w-lg">
+                        We’re hunting for the right Miami space to bring the concept back to life — high foot-traffic, walkable, with room for a tight kitchen and a pickup window. If that sounds like a space you know, tell us about it.
+                    </p>
+
+                    <form class="space-y-6 max-w-md relative z-20" action="#" onsubmit="event.preventDefault(); alert('Thanks for the lead! (Demo only)');">
+                        <div class="relative group">
+                            <label for="scout-email" class="sr-only">Email Address</label>
+                            <input type="email" id="scout-email" placeholder="Your Email Address" required
+                                class="w-full bg-cream/5 border-b border-cream/20 px-4 py-5 font-sans text-cream placeholder-cream/40 focus:outline-none focus:border-tomato focus:bg-cream/10 transition-colors rounded-t-lg">
+                        </div>
+                        <div class="relative group">
+                            <label for="scout-space" class="sr-only">Tell us about the space</label>
+                            <textarea id="scout-space" rows="3" placeholder="Tell us about the space (Location, size, vibes)..." required
+                                class="w-full bg-cream/5 border-b border-cream/20 px-4 py-5 font-sans text-cream placeholder-cream/40 focus:outline-none focus:border-tomato focus:bg-cream/10 transition-colors rounded-t-lg resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="group flex items-center justify-between w-full bg-tomato text-cream px-6 py-5 rounded-lg font-sans text-sm font-bold tracking-wide uppercase hover:bg-tomato/90 active:scale-[0.98] transition-all duration-300">
+                            <span>Send a Lead</span>
+                            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right: Minimalist Map Illustration -->
+                <div class="relative h-full min-h-[400px] flex items-center justify-center lg:justify-end reveal-up delay-200">
+                    <div class="relative w-full aspect-square max-w-[500px]">
+                        <!-- Abstract Map Lines -->
+                        <svg class="w-full h-full text-cream/10 stroke-current drop-shadow-2xl" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 350 L150 200 L250 250 L350 50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20 250 L100 150 L200 180 L300 20" stroke-width="1"/>
+                            <path d="M80 380 L180 280 L280 300 L380 150" stroke-width="1" stroke-dasharray="4 4"/>
+                            <circle cx="150" cy="200" r="4" fill="currentColor"/>
+                            <circle cx="250" cy="250" r="4" fill="currentColor"/>
+                            <!-- Pulse Ring -->
+                            <circle cx="250" cy="250" r="20" stroke="currentColor" stroke-width="1" class="animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50=""/>
+                        </svg>
+                        
+                        <!-- Map Pin -->
+                        <div class="absolute top-[58%] left-[60%] -translate-x-1/2 -translate-y-full text-tomato hover:-translate-y-[110%] transition-transform duration-300 cursor-help">
+                            <svg class="w-12 h-12 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================================
+             SECTION 6: PRESS & NEWSLETTER (Closing Loop)
+             ============================================== -->
+        <section id="notify" class="pt-24 pb-32 bg-cream text-espresso text-center px-6 md:px-12 flex flex-col items-center">
+            
+            <!-- Press Strip Header -->
+            <div class="max-w-[1400px] w-full mb-32 reveal-up">
+                <hr class="border-espresso/10 mb-16">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                    <figure class="pl-6 border-l filter grayscale hover:grayscale-0 transition-all duration-500 border-tomato/50">
+                        <blockquote class="font-serif text-xl text-espresso mb-4">"CRUST Miami set the standard. ProntoBites is about to redefine it."</blockquote>
+                        <figcaption class="font-sans text-xs uppercase tracking-widest text-espresso/50">— Miami Eats</figcaption>
+                    </figure>
+                    <figure class="pl-6 border-l filter grayscale hover:grayscale-0 transition-all duration-500 border-tomato/50">
+                        <blockquote class="font-serif text-xl text-espresso mb-4">"If the original was a destination, the evolution is a daily habit waiting to happen."</blockquote>
+                        <figcaption class="font-sans text-xs uppercase tracking-widest text-espresso/50">— The Local Plate</figcaption>
+                    </figure>
+                    <figure class="pl-6 border-l filter grayscale hover:grayscale-0 transition-all duration-500 border-tomato/50">
+                        <blockquote class="font-serif text-xl text-espresso mb-4">"We’ve been waiting for this return. Fast, uncompromising, purely Italian."</blockquote>
+                        <figcaption class="font-sans text-xs uppercase tracking-widest text-espresso/50">— Miami Chronicle</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <!-- Newsletter Box -->
+            <div class="max-w-3xl w-full bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(27,20,16,0.08)] p-10 md:p-16 reveal-up">
+                <h2 class="font-serif text-4xl md:text-6xl tracking-tight mb-4">Be first in line.</h2>
+                <p class="font-sans text-espresso/70 mb-10 text-lg">Drop your email — we’ll ping you when ProntoBites opens. No spam, just pronto news.</p>
+                
+                <form class="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto" onsubmit="event.preventDefault(); alert('Added to the waitlist!');">
+                    <label for="newsletter-email" class="sr-only">Email Address</label>
+                    <input type="email" id="newsletter-email" placeholder="Email Address" required
+                        class="flex-1 bg-cream/50 border border-espresso/10 px-6 py-4 rounded-full font-sans focus:outline-none focus:ring-2 focus:ring-tomato focus:bg-white transition-all">
+                    <button type="submit" class="bg-espresso text-cream px-8 py-4 rounded-full font-sans text-sm font-bold uppercase tracking-wide hover:bg-tomato active:scale-[0.98] transition-all duration-300">
+                        Notify Me
+                    </button>
+                </form>
+                <div class="mt-8 font-sans text-xs text-espresso/40 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4 text-tomato" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span>Made with love in Miami.</span>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ==============================================
+         FOOTER (Clean Typography Baseline)
+         ============================================== -->
+    <footer class="bg-espresso text-cream pt-20 pb-8 px-6 md:px-12 border-t border-white/10 dark-section">
+        <div class="max-w-[1400px] mx-auto">
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16 border-b border-cream/10 pb-16">
+                <!-- Branding -->
+                <div class="md:col-span-4 lg:col-span-5 transform transition-transform duration-500 hover:scale-[1.02] origin-left cursor-default">
+                    <span class="font-serif text-5xl font-medium tracking-tight block mb-2">Pronto<i class="text-tomato italic">Bites</i></span>
+                    <span class="font-serif italic text-xl text-sage">Italian, Pronto.</span>
+                </div>
+
+                <!-- Nav Links -->
+                <div class="md:col-span-4 lg:col-span-3">
+                    <h4 class="font-sans text-xs uppercase tracking-widest text-cream/40 mb-6 font-bold">Explore</h4>
+                    <nav class="flex flex-col gap-4 font-sans text-sm text-cream/80">
+                        <a href="#concept" class="hover:text-tomato transition-colors w-fit">Concept</a>
+                        <a href="#menu" class="hover:text-tomato transition-colors w-fit">Menu</a>
+                        <a href="#story" class="hover:text-tomato transition-colors w-fit">Story</a>
+                        <a href="#scout" class="hover:text-tomato transition-colors w-fit">Locations</a>
+                        <a href="#notify" class="hover:text-tomato transition-colors w-fit">Press</a>
+                    </nav>
+                </div>
+
+                <!-- Connect -->
+                <div class="md:col-span-4 lg:col-span-4">
+                    <h4 class="font-sans text-xs uppercase tracking-widest text-cream/40 mb-6 font-bold">Connect</h4>
+                    
+                    <div class="flex gap-4 mb-8">
+                        <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-tomato hover:border-tomato hover:text-white transition-all duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                        <a href="#" aria-label="TikTok" class="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-tomato hover:border-tomato hover:text-white transition-all duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                        </a>
+                    </div>
+
+                    <form class="relative group" onsubmit="event.preventDefault(); alert('Added to list!');">
+                        <label for="footer-email" class="sr-only">Get Notified</label>
+                        <input type="email" id="footer-email" placeholder="Get Notified" required
+                            class="w-full bg-transparent border-b border-cream/20 py-3 pr-10 font-sans text-sm text-cream placeholder-cream/40 focus:outline-none focus:border-tomato transition-colors">
+                        <button type="submit" aria-label="Submit" class="absolute right-0 top-1/2 -translate-y-1/2 text-cream/50 hover:text-tomato transition-colors p-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 font-sans text-xs text-cream/40 tracking-wider">
+                <p>&copy; 2026 ProntoBites Miami. All rights reserved.</p>
+                <p>The next chapter of CRUST Miami.</p>
+                <p>Made in Miami 🍅</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- Complex Micro-Interaction Logic Engine -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Navigation Scroll Logic (Refraction Engine)
+            const navbar = document.getElementById('navbar');
+            const handleScroll = () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('nav-scrolled');
+                    navbar.classList.remove('py-4');
+                    navbar.classList.add('py-2');
+                } else {
+                    navbar.classList.remove('nav-scrolled');
+                    navbar.classList.remove('py-2');
+                    navbar.classList.add('py-4');
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll(); // Init
+
+            // 2. Mobile Menu Orchestration
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            let isMenuOpen = false;
+
+            const toggleMenu = () => {
+                isMenuOpen = !isMenuOpen;
+                if(isMenuOpen) {
+                    mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+                    mobileMenu.classList.add('opacity-100');
+                    document.body.style.overflow = 'hidden'; // Stop scroll
+                    menuBtn.innerHTML = `<svg class="w-7 h-7 stroke-[1.5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`;
+                } else {
+                    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+                    mobileMenu.classList.remove('opacity-100');
+                    document.body.style.overflow = '';
+                    menuBtn.innerHTML = `<svg class="w-7 h-7 stroke-[1.5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>`;
+                }
+            };
+
+            menuBtn.addEventListener('click', toggleMenu);
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if(isMenuOpen) toggleMenu();
+                });
+            });
+
+            // 3. Staggered Intersection Observer (Simulated Framer Motion)
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -10% 0px', // Trigger slightly before it hits bottom
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Prevent layout jumping by only adding, never removing
+                        requestAnimationFrame(() => {
+                            entry.target.classList.add('is-visible');
+                        });
+                        observer.unobserve(entry.target); // Run once
+                    }
+                });
+            }, observerOptions);
+
+            // Respect prefers-reduced-motion
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            document.querySelectorAll('.reveal-up').forEach((el) => {
+                if (prefersReducedMotion) {
+                    el.classList.add('is-visible');
+                } else {
+                    observer.observe(el);
+                }
+            });
+
+            // 4. Dark Section Navigation Color Shift Protocol
+            // Track how many dark sections currently intersect the thin band right under
+            // the navbar. When >0, body gets `.dark-section-active`, which flips the
+            // scrolled navbar to its dark variant via CSS. The band is created by a
+            // rootMargin that collapses the viewport to just the top ~10% (under the nav).
+            const darkSections = document.querySelectorAll('.dark-section');
+            let darkIntersectCount = 0;
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        darkIntersectCount++;
+                    } else {
+                        darkIntersectCount = Math.max(0, darkIntersectCount - 1);
+                    }
+                });
+                document.body.classList.toggle('dark-section-active', darkIntersectCount > 0);
+            }, { rootMargin: '0px 0px -90% 0px' });
+
+            darkSections.forEach(sec => navObserver.observe(sec));
+        });
+    </script>
+</body>
+</html>
