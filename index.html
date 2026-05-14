@@ -52,7 +52,7 @@
     <style>
         /* High-End Architectural CSS & Micro-Interactions */
         :root {
-            --nav-height: 88px;
+            --nav-height: 112px;
         }
 
         body {
@@ -121,13 +121,30 @@
         #navbar .text-tomato { color: #D8412C; }
         #navbar .nav-cta { color: #FAF6EE; }
 
-        /* Top-of-page scrim: a subtle dark gradient sitting BEHIND the navbar content
-           that improves legibility of the white logo + cream nav links over the busy
-           hero photo. Fades out as soon as `.nav-scrolled` engages. */
-        .nav-scrim {
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.18) 60%, rgba(0, 0, 0, 0));
+        /* Top-of-hero scrim: a tall dark gradient that lives INSIDE the hero section
+           (not the navbar), so it fades gradually all the way down into the photo with
+           no hard seam at the navbar boundary. Darkens the area behind the navbar
+           enough to keep the white logo + cream nav text legible. Fades out as soon
+           as the user scrolls past the hero (body.is-scrolled toggle from JS). */
+        .hero-scrim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            max-height: 520px;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.65) 0%,
+                rgba(0, 0, 0, 0.40) 25%,
+                rgba(0, 0, 0, 0.18) 55%,
+                rgba(0, 0, 0, 0)    100%
+            );
+            transition: opacity 0.6s ease;
         }
-        #navbar.nav-scrolled .nav-scrim {
+        body.is-scrolled .hero-scrim {
             opacity: 0;
         }
 
@@ -245,14 +262,11 @@
     <!-- Navigation Architecture -->
     <header id="navbar" class="fixed top-0 w-full z-40 transition-all duration-500 bg-transparent py-4">
 
-        <!-- Top-of-hero scrim (dark gradient) — fades out when .nav-scrolled engages -->
-        <div class="nav-scrim absolute inset-0 pointer-events-none transition-opacity duration-500"></div>
-
         <div class="relative max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-[var(--nav-height)]">
 
             <!-- Logo -->
             <a href="#" class="z-50 relative group flex items-center" aria-label="ProntoBites Miami — Home">
-                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="280" height="64" loading="eager" class="logo-img h-14 md:h-16 w-auto" />
+                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="200" height="178" loading="eager" class="logo-img h-20 md:h-24 w-auto" />
             </a>
 
             <!-- Desktop Nav -->
@@ -299,13 +313,16 @@
         <!-- ==============================================
              SECTION 1: HERO (Immersive Macro-Architecture)
              ============================================== -->
-        <section class="relative min-h-[100dvh] w-full flex flex-col justify-end pb-32 overflow-hidden bg-espresso">
+        <section class="relative min-h-[100dvh] w-full flex flex-col justify-end pb-20 md:pb-32 overflow-hidden bg-espresso">
             <!-- Background Image -->
             <div class="absolute inset-0 z-0">
                 <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=2800&q=80" alt="Close up of a hot, freshly baked Neapolitan margherita pizza slice being lifted" class="w-full h-full object-cover object-center scale-105 animate-[pulse_20s_ease-in-out_infinite_alternate]" />
                 <div class="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/60 to-black/20 mix-blend-multiply"></div>
                 <div class="absolute inset-0 bg-gradient-to-r from-espresso/80 via-transparent to-transparent"></div>
             </div>
+
+            <!-- Top-of-hero scrim — tall, smooth fade into the photo so navbar contents stay legible without a hard seam -->
+            <div class="hero-scrim" aria-hidden="true"></div>
 
             <!-- Content Area -->
             <div class="relative z-10 max-w-[1400px] w-full mx-auto px-6 md:px-12 text-cream pt-32">
@@ -929,7 +946,7 @@
                 <!-- Branding -->
                 <div class="md:col-span-12 lg:col-span-5 transform transition-transform duration-500 hover:scale-[1.02] origin-left">
                     <a href="#" aria-label="ProntoBites Miami — Home" class="block">
-                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="360" height="96" loading="lazy" class="logo-img h-20 md:h-24 w-auto mb-4" />
+                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="320" height="285" loading="lazy" class="logo-img h-28 md:h-32 w-auto mb-4" />
                     </a>
                     <span class="font-serif italic text-xl text-sage block">Italian, Pronto.</span>
                     <p class="mt-6 font-sans text-sm text-cream/60 max-w-sm leading-relaxed">
@@ -990,15 +1007,13 @@
             // 1. Navigation Scroll Logic (Refraction Engine)
             const navbar = document.getElementById('navbar');
             const handleScroll = () => {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('nav-scrolled');
-                    navbar.classList.remove('py-4');
-                    navbar.classList.add('py-2');
-                } else {
-                    navbar.classList.remove('nav-scrolled');
-                    navbar.classList.remove('py-2');
-                    navbar.classList.add('py-4');
-                }
+                const scrolled = window.scrollY > 50;
+                navbar.classList.toggle('nav-scrolled', scrolled);
+                navbar.classList.toggle('py-2', scrolled);
+                navbar.classList.toggle('py-4', !scrolled);
+                // Body class drives the hero scrim fade-out (and any other
+                // scroll-aware page chrome we add later).
+                document.body.classList.toggle('is-scrolled', scrolled);
             };
             window.addEventListener('scroll', handleScroll, { passive: true });
             handleScroll(); // Init
