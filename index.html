@@ -52,7 +52,7 @@
     <style>
         /* High-End Architectural CSS & Micro-Interactions */
         :root {
-            --nav-height: 80px;
+            --nav-height: 88px;
         }
 
         body {
@@ -121,11 +121,35 @@
         #navbar .text-tomato { color: theme('colors.tomato'); }
         #navbar .nav-cta { color: theme('colors.cream'); }
 
+        /* Top-of-page scrim: a subtle dark gradient sitting BEHIND the navbar content
+           that improves legibility of the white logo + cream nav links over the busy
+           hero photo. Fades out as soon as `.nav-scrolled` engages. */
+        .nav-scrim {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.18) 60%, rgba(0, 0, 0, 0));
+        }
+        #navbar.nav-scrolled .nav-scrim {
+            opacity: 0;
+        }
+
+        /* Default-state legibility: drop-shadow on logo, text-shadow on text.
+           Both vanish when scrolled (the navbar gets its own solid blur background). */
+        #navbar .logo-img {
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+        }
+        #navbar a,
+        #navbar nav a,
+        #navbar button {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+        }
+        #navbar .nav-cta {
+            text-shadow: none; /* CTA button has its own bg, no shadow needed */
+        }
+
         /* Logo image color treatment across navbar states.
            The source logo PNG is white/cream on transparent (designed for dark bg).
-           - Default (top of page, transparent nav over dark hero): native (light) — no filter
-           - Scrolled over LIGHT section: tint dark via brightness(0)
-           - Scrolled over DARK section: restore native (light)
+           - Default (top of page, transparent nav over dark hero): native (light) + drop-shadow
+           - Scrolled over LIGHT section: tint dark via brightness(0), no shadow
+           - Scrolled over DARK section: restore native (light), no shadow
            - Footer (always dark): native (light) — no filter
         */
         .logo-img {
@@ -137,6 +161,11 @@
         }
         body.dark-section-active #navbar.nav-scrolled .logo-img {
             filter: none;
+        }
+        #navbar.nav-scrolled a,
+        #navbar.nav-scrolled nav a,
+        #navbar.nav-scrolled button {
+            text-shadow: none;
         }
 
         /* Link Underline Animation */
@@ -215,11 +244,15 @@
 
     <!-- Navigation Architecture -->
     <header id="navbar" class="fixed top-0 w-full z-40 transition-all duration-500 bg-transparent py-4">
-        <div class="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-[var(--nav-height)]">
+
+        <!-- Top-of-hero scrim (dark gradient) — fades out when .nav-scrolled engages -->
+        <div class="nav-scrim absolute inset-0 pointer-events-none transition-opacity duration-500"></div>
+
+        <div class="relative max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center h-[var(--nav-height)]">
 
             <!-- Logo -->
             <a href="#" class="z-50 relative group flex items-center" aria-label="ProntoBites Miami — Home">
-                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="180" height="40" class="logo-img h-10 md:h-11 w-auto" />
+                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="280" height="64" loading="eager" class="logo-img h-14 md:h-16 w-auto" />
             </a>
 
             <!-- Desktop Nav -->
@@ -896,7 +929,7 @@
                 <!-- Branding -->
                 <div class="md:col-span-12 lg:col-span-5 transform transition-transform duration-500 hover:scale-[1.02] origin-left">
                     <a href="#" aria-label="ProntoBites Miami — Home" class="block">
-                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="280" height="64" class="logo-img h-16 md:h-20 w-auto mb-4" />
+                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="360" height="96" loading="lazy" class="logo-img h-20 md:h-24 w-auto mb-4" />
                     </a>
                     <span class="font-serif italic text-xl text-sage block">Italian, Pronto.</span>
                     <p class="mt-6 font-sans text-sm text-cream/60 max-w-sm leading-relaxed">
