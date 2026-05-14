@@ -52,23 +52,15 @@
     <style>
         /* High-End Architectural CSS & Micro-Interactions */
         :root {
-            --nav-height: 160px;
-        }
-        @media (min-width: 768px) {
-            :root {
-                --nav-height: 192px;
-            }
+            /* Fluid navbar height — scales 180px (phone) → 26vw → 240px (large desktop).
+               Tracks the fluid logo height (clamp(140px, 22vw, 200px)) with ~40px breathing room. */
+            --nav-height: clamp(180px, 26vw, 240px);
         }
         /* When the user scrolls past the hero, redefine --nav-height locally on the
            navbar so the inner h-[var(--nav-height)] container shrinks back to a
            reasonable compact strip. Logo image also scales down (see below). */
         #navbar.nav-scrolled {
-            --nav-height: 88px;
-        }
-        @media (min-width: 768px) {
-            #navbar.nav-scrolled {
-                --nav-height: 96px;
-            }
+            --nav-height: clamp(80px, 11vw, 96px);
         }
 
         body {
@@ -147,8 +139,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 60vh;
-            max-height: 640px;
+            height: 70vh;
+            max-height: 720px;
             z-index: 1;
             pointer-events: none;
             background: linear-gradient(
@@ -194,12 +186,7 @@
            default Tailwind height utilities on the <img>. */
         #navbar.nav-scrolled .logo-img {
             filter: brightness(0);
-            height: 56px;
-        }
-        @media (min-width: 768px) {
-            #navbar.nav-scrolled .logo-img {
-                height: 64px;
-            }
+            height: clamp(52px, 7vw, 68px);
         }
         body.dark-section-active #navbar.nav-scrolled .logo-img {
             filter: none;
@@ -291,7 +278,7 @@
 
             <!-- Logo -->
             <a href="#" class="z-50 relative group flex items-center" aria-label="ProntoBites Miami — Home">
-                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="240" height="214" loading="eager" class="logo-img h-28 md:h-36 lg:h-40 w-auto" />
+                <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="400" height="356" loading="eager" class="logo-img h-[clamp(140px,22vw,200px)] w-auto" />
             </a>
 
             <!-- Desktop Nav -->
@@ -971,7 +958,7 @@
                 <!-- Branding -->
                 <div class="md:col-span-12 lg:col-span-5 transform transition-transform duration-500 hover:scale-[1.02] origin-left">
                     <a href="#" aria-label="ProntoBites Miami — Home" class="block">
-                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="400" height="356" loading="lazy" class="logo-img h-32 md:h-40 w-auto mb-4" />
+                        <img src="https://prontobitesmiami.com/images/logo.png" alt="ProntoBites Miami logo" width="480" height="427" loading="lazy" class="logo-img h-40 md:h-48 w-auto mb-4" />
                     </a>
                     <span class="font-serif italic text-xl text-sage block">Italian, Pronto.</span>
                     <p class="mt-6 font-sans text-sm text-cream/60 max-w-sm leading-relaxed">
